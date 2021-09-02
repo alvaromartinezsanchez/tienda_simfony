@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion Productos{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    {# total items count #}
+    <div class="count">
+        <h5 style="margin: 3rem auto">Total Productos: {{ pagination.getTotalItemCount }} </h5>
+    </div>
+    <table class="table table-dark table-striped">
+        <tr>
+            {# sorting of properties based on query components #}
+            <th{% if pagination.isSorted('p.imagen') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Imagen', 'p.imagen') }}
+            </th>
+            <th{% if pagination.isSorted(['p.nombre']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Nombre', 'p.nombre') }}
+            </th>
+            <th{% if pagination.isSorted(['p.descripcion']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Descripcion', 'p.descripcion') }}
+            </th>
+            <th{% if pagination.isSorted(['p.precio']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Precio', 'p.precio') }}
+            </th>
+            <th{% if pagination.isSorted(['p.stock']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Stock', 'p.stock') }}
+            </th>
+            <th{% if pagination.isSorted(['p.oferta']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Oferta', 'p.oferta') }}
+            </th>
+            <th{% if pagination.isSorted(['p.fecha']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Fecha', 'p.fecha') }}
+            </th>
+            <th{% if pagination.isSorted(['p.categoria']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Categoria', 'p.categoria') }}
+            </th>
+            <th>Opciones</th>
+        </tr>
+
+        {# table body #}
+        {% for article in pagination %}
+            <tr {% if loop.index is odd %}class="color"{% endif %}>
+                <td>
+                    {% if article.imagen %}
+                        <img src="{{ asset( article.imagen , 'imagen') }}"  alt="Imagen Articulo {{article.nombre}}" style="width: 4rem; height:4rem">
+                    {% else %}
+                        <img src="..." class="card-img-top" alt="...">
+                    {% endif %}
+                </td>
+                <td>{{ article.nombre }}</td>
+                <td>{{ article.descripcion }}</td>
+                <td>{{ article.precio }}</td>
+                <td>{{ article.stock }}</td>
+                <td>{{ article.oferta }}</td>
+                <td>{{ article.fecha | date('Y-m-d') }}</td>
+                <td>{{ article.categoria.nombre }}</td>
+                <td class="">
+                    <a href="{{ path('detalle_producto', {'id':article.id}) }}" class="btn btn-success col-12 col-lg-4 mb-1 col-xl-3 mb-xl-0">Ver</a>
+                    {% if app.user != null and app.user.role == 'ROLE_ADMIN' %}
+                        <a href="{{ path('editar_producto', {'id':article.id, 'categoria':article.categoria.id}) }}" class="btn btn-warning col-12 col-lg-6 mb-1 col-xl-4 mb-xl-0">Editar</a>
+                        <a href="{{ path('borrar_producto', {'id':article.id}) }}" class="btn btn-danger col-12 col-lg-11 col-xl-4">Borrar</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+</div>
+{% endblock %}

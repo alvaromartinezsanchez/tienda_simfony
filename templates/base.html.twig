@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {# Run `composer require symfony/webpack-encore-bundle`
+           and uncomment the following Encore helpers to start using Symfony UX #}
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+            <link href="{{ asset('assets/css/styles.css') }}" type="text/css" rel="stylesheet">
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+    </head>
+    <body>
+        {% block header %}
+
+            
+            <nav class="navbar sticky-top navbar-expand-md navbar-light bg-light">
+                <div class="container-fluid">
+                    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" href="{{ path('mostrar_productos') }}">Inicio</a>
+                            </li>
+                            {% if app.user.id is defined %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('editar_usuario', {'id':app.user.id}) }}">Mi Cuenta</a>
+                            </li>
+                            {% endif %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Categorias
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#">Cascos</a></li>
+                                <li><a class="dropdown-item" href="#">Gatos</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">Camisetas</a></li>
+                            </ul>
+                            </li>
+                        </ul>
+                        <form class="d-flex">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success" type="submit">Buscar</button>
+                            <a class="navbar-brand" href="#" style="margin-left: 1rem">
+                                {% if app.user %}
+                                    {{ app.user.nombre}}
+                                {% endif %}
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+
+
+            <nav class="navbar sticky-top navbar-expand-md navbar-light bg-light">
+                <div class="container-fluid">
+                    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    {% if app.user.role is defined and app.user.role == 'ROLE_ADMIN' %}
+                
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" href="{{ path('gestion_usuarios') }}">Gestion Usuarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('gestion_productos') }}">Gestion Articulos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Gestion Pedidos</a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <ul class="navbar-nav">
+                        {% if app.user %}
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{{ path('mostrar_carrito') }}">Carrito</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('logout') }}">cerrar sesion</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('login') }}">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('registro') }}">Registro</a>
+                            </li>
+                        {% endif %}
+                        </ul>
+                </div>
+            </nav>
+        {% endblock %}
+
+        {% block body %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,85 @@
+#-- USUSARIO ---
+registro:
+    path: /registro
+    controller: App\Controller\UsuarioController::registro
+
+
+login:
+    path: /login
+    controller: App\Controller\UsuarioController::login
+
+logout:
+    path: /logout
+
+gestion_usuarios:
+    path: /gestion_usuarios
+    controller: App\Controller\UsuarioController::gestionUsuarios
+
+detalle_usuario:
+    path: /detalle_usuario{id}
+    controller: App\Controller\UsuarioController::detalleUsuario
+
+editar_usuario:
+    path: /editar_usuario/{id}/{changePassword}
+    controller: App\Controller\UsuarioController::editarUsuario
+    defaults:
+        changePassword: false
+
+borrar_usuario:
+    path: /borrar_usuario{id}
+    controller: App\Controller\UsuarioController::borrarUsuario
+
+#-- PRODUCTO ---
+crear_producto:
+    path: /crear_producto
+    controller: App\Controller\ProductoController::crearProducto
+
+mostrar_productos:
+    path: /
+    controller: App\Controller\ProductoController::mostrarProductos
+
+gestion_productos:
+    path: /gestion_productos
+    controller: App\Controller\ProductoController::gestionProductos
+
+detalle_producto:
+    path: /detalle_producto{id}
+    controller: App\Controller\ProductoController::detalleProducto
+
+editar_producto:
+    path: /editar_producto/{id}/{categoria}
+    controller: App\Controller\ProductoController::editarProducto
+
+borrar_producto:
+    path: /borrar_producto{id}
+    controller: App\Controller\ProductoController::borraProducto
+
+#-- CARRITO ---
+mostrar_carrito:
+    path: /mostrar_carrito
+    controller: App\Controller\CarritoController::mostrarCarrito
+    
+add_producto:
+    path: /add_producto{id}
+    controller: App\Controller\CarritoController::addProducto
+
+restar_producto:
+    path: /restar_producto{id}
+    controller: App\Controller\CarritoController::restarProducto
+
+sumar_producto:
+    path: /sumar_producto{id}
+    controller: App\Controller\CarritoController::sumarProducto
+
+delete_producto:
+    path: /delete_producto{id}
+    controller: App\Controller\CarritoController::deleteProducto
+
+delete_all:
+    path: /delete_all
+    controller: App\Controller\CarritoController::deleteAll
+
+#-- PEDIDO ---
+realizar_pedido:
+    path: /realizar_pedido
+    controller: App\Controller\PedidoController::realizarPedido

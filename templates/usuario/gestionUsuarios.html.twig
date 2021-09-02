@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion Usuarios{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    {# total items count #}
+    <div class="head">
+        <h5 style="margin: 3rem auto">Listado Usuarios: <h6>Total: {{ pagination.getTotalItemCount }} </h6></h5>
+    </div>
+    <a class="btn btn-success mb-2" href="{{ path('registro') }}">Crear nuevo usuario</a>
+    <table class="table table-dark table-striped">
+        <tr>
+            {# sorting of properties based on query components #}
+            <th{% if pagination.isSorted('u.imagen') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Imagen', 'u.imagen') }}
+            </th>
+            <th{% if pagination.isSorted(['u.nombre']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Nombre', 'u.nombre') }}
+            </th>
+            <th{% if pagination.isSorted(['u.apellidos']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Apellidos', 'u.apellidos') }}
+            </th>
+            <th{% if pagination.isSorted(['u.email']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Email', 'u.email') }}
+            </th>
+            <th{% if pagination.isSorted(['u.role']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Rol', 'u.role') }}
+            </th>
+            <th{% if pagination.isSorted(['u.createdAt']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Fecha Alta', 'u.createdAt') }}
+            </th>
+            <th>Opciones</th>
+        </tr>
+
+        {# table body #}
+        {% for article in pagination %}
+            <tr {% if loop.index is odd %}class="color"{% endif %}>
+                <td>
+                    {% if article.imagen %}
+                        <img src="{{ asset( article.imagen , 'imagen') }}"  alt="Imagen Articulo {{article.nombre}}" style="width: 4rem; height:4rem">
+                    {% else %}
+                        <img src="uploads/imagenes/image_user_default.jpg" style="width: 4rem; height:4rem">
+                    {% endif %}
+                </td>
+                <td>{{ article.nombre }}</td>
+                <td>{{ article.apellidos }}</td>
+                <td>{{ article.email }}</td>
+                <td>
+                    {% if article.role == 'ROLE_ADMIN' %}
+                        Administrador
+                    {% else %}
+                        Usuario
+                    {% endif %}
+                </td>
+                <td>{{ article.createdAt | date('Y-m-d') }}</td>
+                <td class="">
+                    <a href="{{ path('detalle_usuario', {'id':article.id}) }}" class="btn btn-success col-12 col-lg-4 mb-1 col-xl-3 mb-xl-0">Ver</a>
+                    {% if app.user != null and app.user.role == 'ROLE_ADMIN' %}
+                        <a href="{{ path('editar_usuario', {'id':article.id}) }}" class="btn btn-warning col-12 col-lg-6 mb-1 col-xl-4 mb-xl-0">Editar</a>
+                        <a href="{{ path('borrar_usuario', {'id':article.id}) }}" class="btn btn-danger col-12 col-lg-11 col-xl-4">Borrar</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+</div>
+{% endblock %}

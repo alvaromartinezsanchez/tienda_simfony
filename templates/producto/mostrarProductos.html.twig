@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registro de Productos{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <h1 class="col-4">Productos</h1>
+    </div>
+    {# total items count #}
+    <div class="count">
+        {{ pagination.getTotalItemCount }}
+    </div>
+
+    
+    <div class="row">
+        {# table body #}
+        {% for article in pagination %}
+            
+            <div class="col-lg-3 col-md-4 col-sm-8" style="margin-bottom: 3rem; width:16rem">
+                <div class="card card-block">
+                    {% if article.imagen %}
+                        <img src="{{ asset( article.imagen , 'imagen') }}"  alt="Imagen Articulo {{article.nombre}}">
+                    {% else %}
+                        <img src="..." class="card-img-top" alt="...">
+                    {% endif %}
+                    
+                    <h5 class="card-title mt-3 mb-3">{{article.nombre}}</h5>
+                    <p class="card-text"> {{ article.precio }} €</p>
+                    <a href="{{ path('add_producto', {'id':article.id}) }}" class="btn btn-primary">Comprar</a>
+                </div>
+            </div>
+
+
+            
+        {% endfor %}
+    </div>
+    {# display navigation #}
+    <div class="navigation" style="margin-top: 10rem">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+</div>
+
+{% endblock %}

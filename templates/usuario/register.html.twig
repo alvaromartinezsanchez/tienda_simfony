@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registro de Usuarios{% endblock %}
+
+{% block body %}
+
+<div class="container register_form">
+    <div class="row justify-content-center">
+        {% if edit is defined and edit %}
+            Editar Usuario
+        {% else %}
+            Registrar Usuario
+        {% endif %}
+    </div>
+    
+
+    {{ form_start(form) }}
+    <div class="row justify-content-center">
+        <div class="col-5">
+            {{ form_row(form.nombre) }}
+        </div>
+        <div class="col-6 justify-content-center">
+            {{ form_row(form.apellidos) }}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-11">
+            {{ form_row(form.email) }}
+        </div>
+    </div>
+    {% if edit is defined and edit %}
+            {% if changePassword is defined and changePassword %}
+                <div class="row justify-content-center">
+                    <div class="col-11">
+                    {{ form_row(form.password) }}
+                    </div>
+                </div>
+            {% endif %}
+    {% else %}
+        <div class="row justify-content-center">
+            <div class="col-11">
+            {{ form_row(form.password) }}
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if isAdmin is defined and isAdmin %}
+        <div class="row justify-content-center">
+            <div class="col-11">
+                {{ form_row(form.role) }}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row justify-content-center">
+        <div class="col-11">
+            {{ form_row(form.foto) }}
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-6">
+            {{ form_row(form.submit) }}
+        </div>
+
+        {% if edit is defined and edit and changePassword is defined and not changePassword %}
+        <div class="col-5">
+            <a href="{{ path('editar_usuario', {'id':usuario.id, 'changePassword': true}) }}" class="btn btn-success">Cambiar Contraseña </a>
+        </div>
+        {% endif %}
+
+    </div>
+
+    {{ form_end(form) }}
+
+    
+</div>
+
+{% endblock %}

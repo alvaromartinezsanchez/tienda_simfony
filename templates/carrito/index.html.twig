@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CarritoController!{% endblock %}
+
+{% block body %}
+{% if productos %}
+<div class="container">
+    <div class="row">
+        <div class="col-8">        
+            <table class="table table-dark table-striped">
+                <tr>
+                    <div class="row">
+                        <th class="col-1">Imagen</th>
+                        <th class="col-2">Nombre</th>
+                        <th class="col-2">Precio</th>
+                        <th class="col-3">Unidades</th>
+                        <th class="col-2">Opciones</th>
+                    </div>
+                </tr>
+        {% for producto in productos %}
+            {% if producto.unidades > 0  %}
+                <tr>
+                    <div class="row">
+                        <td class="col-1">
+                            {% if producto.producto.imagen %}
+                                <img src="{{ asset( producto.producto.imagen , 'imagen') }}" style="width: 4rem; height:3rem">
+                            {% else %}
+                                <img src="..." class="card-img-top" alt="...">
+                            {% endif %}
+                        </td>
+                        <td class="col-2">{{ producto.producto.nombre }}</td>
+                        <td class="col-2">{{ producto.precio }}</td>
+                        <td class="col-3">
+                            <div class="row justify-content-center">
+                                <a href="{{ path('restar_producto', {'id':producto.id}) }}" class="btn btn-danger col-2">-</a>
+                                    <div class="col-2">{{ producto.unidades }}</div>
+                                <a href="{{ path('sumar_producto', {'id':producto.id}) }}" class="btn btn-success col-2">+</a>
+                            </div>
+                        </td>
+                        <td><a href="{{ path('delete_producto', {'id':producto.id}) }}" class="btn btn-danger col-10">Borrar</a></td>
+                    </div>
+                </tr>
+                    
+            {% endif %} 
+        {% endfor %}
+                    <tr>
+                        <td class="col-4"><a href="{{ path('delete_all') }}" class="btn btn-danger">Vaciar Carrito</a></td>
+                    </tr>
+                </table>
+        </div>
+        <div class="col-3">
+            <h4>Total a pagar: <h6>{{ total }} € </h6></h4>
+            <a href="{{ path('realizar_pedido') }}" class="btn btn-success">Comprar</a>
+        </div>
+    </div>
+</div>
+{% else %}
+    <h2>El usuario no tiene productos en el carrito</h2>
+{% endif %}    
+
+{% endblock %}

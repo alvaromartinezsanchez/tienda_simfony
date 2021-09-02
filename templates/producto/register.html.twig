@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if edit is defined %}
+        Editar Producto
+    {% else %}
+        Registrar Producto
+    {% endif %}{% endblock %}
+
+{% block body %}
+
+<div class="container register_form">
+    <div class="row justify-content-center">
+    {% if edit is defined %}
+        <h1 class="col-8">Editar Producto</h1>
+    {% else %}
+        <h1 class="col-8">Registrar Producto</h1>
+    {% endif %}
+        
+    </div>
+    
+
+    {{ form_start(form) }}
+    <div class="row">
+        <div class="col-5">
+            {{ form_row(form.nombre) }}
+        </div>
+        <div class="col-6">
+            {{ form_row(form.categoria) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-11">
+            {{ form_row(form.descripcion) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-5">
+            {{ form_row(form.precio) }}
+        </div>
+        <div class="col-6">
+            {{ form_row(form.stock) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-11">
+            {{ form_row(form.oferta) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-11">
+            {{ form_row(form.foto) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-11">
+            {{ form_row(form.submit) }}
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>
+
+{% endblock %}

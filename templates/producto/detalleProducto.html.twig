@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registro de Productos{% endblock %}
+
+{% block body %}
+
+<div class="container">
+   <div class="row">
+
+    <div class="col-3 align-self-center offset-2">
+        <img src="{{ asset( producto.imagen , 'imagen') }}"  alt="Imagen Articulo {{producto.nombre}}" style="width: 8rem">
+    </div>
+
+    <div class="col-6">
+        <h5>Nombre: {{ producto.nombre }}</h5>
+        <h5>Descripcion: {{ producto.descripcion }}</h5>
+        <h5>Precio: {{ producto.precio }} €</h5>
+        <h5>Stock: {{ producto.stock }}</h5>
+        <h5>Oferta: {{ producto.oferta }}</h5>
+        <h5>Fecha: {{ producto.fecha | date('Y-m-d') }}</h5>
+        <h5>Categoria: {{ producto.categoria.nombre }}</h5>
+    </div>
+        
+   </div>
+</div>
+{% endblock %}
