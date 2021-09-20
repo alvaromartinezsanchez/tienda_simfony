@@ -31,7 +31,7 @@ class LineasPedido
     /**
      * @var \Pedido
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Pedido", cascade = {"persist"}, inversedBy="lineasPedido")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Pedido", inversedBy="lineasPedido")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="pedido_id", referencedColumnName="id")
      * })

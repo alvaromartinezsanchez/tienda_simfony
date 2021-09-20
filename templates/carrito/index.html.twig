@@ -3,7 +3,7 @@
 {% block title %}Hello CarritoController!{% endblock %}
 
 {% block body %}
-{% if productos %}
+{% if productos is defined and productos %}
 <div class="container">
     <div class="row">
         <div class="col-8">        

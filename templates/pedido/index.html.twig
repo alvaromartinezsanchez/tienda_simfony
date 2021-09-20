@@ -12,7 +12,12 @@
     
         
         {% if pedido %}
-            {{ pedido.id }} {{ pedido.provincia }}
+            Id:{{ pedido.id }}| Nombre:{{ pedido.usuario.nombre }}| Apellidos:{{ pedido.usuario.apellidos }} | Provincia:{{ pedido.provincia }}| Localidad:{{ pedido.localidad }}| Direccion:{{ pedido.direccion }}
+            | Coste:{{ pedido.coste }} | Estado:{{ pedido.estado }} | Fecha:{{ pedido.fecha | date('Y-m-d') }}| Hora:{{ pedido.hora | date('H:m:s') }}
+            | Lineas Pedido:
+            {% for lineaPedido in pedido.lineasPedido %}
+                ID:{{ lineaPedido.id }}| Pedido ID:{{ lineaPedido.pedido.id }}| Producto: {{ lineaPedido.producto.nombre }}| Unidades: {{ lineaPedido.unidades }}
+            {% endfor %}
         {% endif %}
     
 </div>

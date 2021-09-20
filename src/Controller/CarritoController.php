@@ -23,83 +23,81 @@ class CarritoController extends AbstractController
 
     public function mostrarCarrito(){
         $requestStack = $this->requestStack->getSession();
-        $productos = array();
+        $carrito = $requestStack->get('Carrito');
+        if($carrito == null){
+            return $this->render('carrito/index.html.twig');
+        }
         $total =0;
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                array_push($productos,$pro);
-                $total += $pro['precio'] * $pro['unidades'];
-            }
+        foreach ($carrito as $producto_carrito) {
+            $total += $producto_carrito['precio'] * $producto_carrito['unidades'];
+            
         }
 
         return $this->render('carrito/index.html.twig', [
-            'productos' => $productos,
+            'productos' => $carrito,
             'total' => $total
         ]);
     }
 
-    public function addProducto(Producto $producto): Response
+    public function addProducto(Producto $producto)
     {
         //Obtiene session
         $requestStack = $this->requestStack->getSession();
 
-        //Si numero no existe es el primer articulo del carrito
-        if($requestStack->get('numero') == null){
-            //Inicializamos numero a valor 1
-            $requestStack->set('numero', 1);
-            $numero = $requestStack->get('numero');
-
-            //Añadimos el producto con el indice 1
-            $requestStack->set($numero, array(
+        if($requestStack->get('Carrito') == null){
+            //Crea variable sesion carrito
+            $requestStack->set('Carrito', array());
+            //Almacena datos(lineas/productos) del carrito
+            $carrito = $requestStack->get('Carrito');
+            //Almacena cada linea/producto en el carrito
+            $producto_carrito = array(
                 'id' => $producto->getId(),
                 'precio' => $producto->getPrecio(),
                 'unidades' => 1,
                 'producto' => $producto
-            
-                ));
-        }else{//Si ya hay articulos en el carrito
-            //obtenemos el numero de articulos existente
-            $numero = $requestStack->get('numero');
+            );
+            //Añade al array carrito la linea del nuevo producto
+            array_push($carrito, $producto_carrito);
+            //Actualiza valor de variable de session carrito
+            $requestStack->set('Carrito', $carrito);
+        }else{
+            //Obtiene datos(lineas/productos) del carrito
+            $carrito = $requestStack->get('Carrito');
+            //Existe el producto en el carrito
             $existe = false;
-            //Recorre objetos del carrito
-            foreach ($requestStack as $pro) {
-                if(is_array($pro)){
-                    $cont=1;
-                    //Si el articulo ya esta en el carrito aumenta sus unidades
-                    if($pro['id'] == $producto->getId()){
-                        $pro['unidades'] ++;
-                        $requestStack->set($cont, $pro);
-                        $existe = true;
-                    }
-                    $cont++;
+            foreach ($carrito as $key => $producto_carrito) {
+                if($producto_carrito['id'] == $producto->getId()){
+                    $existe = true;
+                    //Aumenta las unidades del articulo
+                    $carrito[$key]['unidades'] ++;
                 }
-                
-            }//Si el producto no existe en el carrito
+            }
+            //Actualiza valor de variable de session carrito
+            $requestStack->set('Carrito', $carrito);
+            //Si el producto no existe
             if(!$existe){
-                //Añadimos el producto con el indice correspondiente
-                $requestStack->set($numero, array(
+                //Almacena cada linea/producto en el carrito
+                $producto_carrito = array(
                     'id' => $producto->getId(),
                     'precio' => $producto->getPrecio(),
                     'unidades' => 1,
                     'producto' => $producto
-                ));
+                );
+                //Añade al array carrito la linea del nuevo producto
+                array_push($carrito, $producto_carrito);
+                //Actualiza valor de variable de session carrito
+                $requestStack->set('Carrito', $carrito);
             }
         }
-        //Aumenta valor de numero(indice)
-        $numero = $requestStack->get('numero') + 1;
-        $requestStack->set('numero', $numero);
-        //Obtenemos los productos del carrito
-        $productos = array();
+        //Obtiene precio total del carrito
         $total =0;
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                array_push($productos,$pro);
-                $total += $pro['precio'] * $pro['unidades'];
-            }
+        foreach ($carrito as $producto_carrito) {
+            $total += $producto_carrito['precio'] * $producto_carrito['unidades'];
+            
         }
 
         return $this->render('carrito/index.html.twig', [
-            'productos' => $productos,
+            'productos' => $carrito,
             'total' => $total
         ]);
     }
@@ -108,30 +106,31 @@ class CarritoController extends AbstractController
         //Obtiene session
         $requestStack = $this->requestStack->getSession();
 
-        //Recorre objetos del carrito
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                $cont=1;
-                //Si el articulo ya esta en el carrito aumenta sus unidades
-                if($pro['id'] == $producto->getId()){
-                    $pro['unidades'] --;
-                    $requestStack->set($cont, $pro);
+        //Obtiene datos del carrito
+        $carrito = $requestStack->get('Carrito');
+        //Recorre los articulos del carrito
+        foreach ($carrito as $key => $producto_carrito) {
+            if($producto_carrito['id'] == $producto->getId()){
+                //Resta unidad del articulo
+                $carrito[$key]['unidades'] --;
+                //Si las unidades se quedan en 0 elimina el registro del articulo
+                if($carrito[$key]['unidades'] == 0){
+                    unset($carrito[$key]);
                 }
-                $cont++;
             }
         }
-        //Obtenemos los productos del carrito
-        $productos = array();
+        //Actualiza valor de variable de session carrito
+        $requestStack->set('Carrito', $carrito);
+
+        //Obtiene precio total del carrito
         $total =0;
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                array_push($productos,$pro);
-                $total += $pro['precio'] * $pro['unidades'];
-            }
+        foreach ($carrito as $producto_carrito) {
+            $total += $producto_carrito['precio'] * $producto_carrito['unidades'];
+            
         }
 
         return $this->render('carrito/index.html.twig', [
-            'productos' => $productos,
+            'productos' => $carrito,
             'total' => $total
         ]);
     }
@@ -140,32 +139,27 @@ class CarritoController extends AbstractController
         //Obtiene session
         $requestStack = $this->requestStack->getSession();
 
-        //Recorre objetos del carrito
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                $cont=1;
-                //Si el articulo ya esta en el carrito aumenta sus unidades
-                if($pro['id'] == $producto->getId()){
-                    if ($producto->getStock() -$pro['unidades'] >= 0){
-                        $pro['unidades'] ++;
-                        $requestStack->set($cont, $pro); 
-                    }
-                }
-                $cont++;
+        //Obtiene datos del carrito
+        $carrito = $requestStack->get('Carrito');
+        //Recorre los articulos del carrito
+        foreach ($carrito as $key => $producto_carrito) {
+            if($producto_carrito['id'] == $producto->getId()){
+                //Suma unidad del articulo
+                $carrito[$key]['unidades'] ++;
             }
         }
-        //Obtenemos los productos del carrito
-        $productos = array();
+        //Actualiza valor de variable de session carrito
+        $requestStack->set('Carrito', $carrito);
+
+        //Obtiene precio total del carrito
         $total =0;
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                array_push($productos,$pro);
-                $total += $pro['precio'] * $pro['unidades'];
-            }
+        foreach ($carrito as $producto_carrito) {
+            $total += $producto_carrito['precio'] * $producto_carrito['unidades'];
+            
         }
 
         return $this->render('carrito/index.html.twig', [
-            'productos' => $productos,
+            'productos' => $carrito,
             'total' => $total
         ]);
     }
@@ -174,46 +168,36 @@ class CarritoController extends AbstractController
         //Obtiene session
         $requestStack = $this->requestStack->getSession();
 
-        //Recorre objetos del carrito
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                $cont=1;
-                //Si el articulo ya esta en el carrito aumenta sus unidades
-                if($pro['id'] == $producto->getId()){
-                    $requestStack->remove($cont); 
-                }
-                $cont++;
+        //Obtiene datos del carrito
+        $carrito = $requestStack->get('Carrito');
+        //Recorre los articulos del carrito
+        foreach ($carrito as $key => $producto_carrito) {
+            if($producto_carrito['id'] == $producto->getId()){
+                //Elimina articulo del carrito
+                unset($carrito[$key]);
             }
         }
-        //Obtenemos los productos del carrito
-        $productos = array();
+        //Actualiza valor de variable de session carrito
+        $requestStack->set('Carrito', $carrito);
+
+        //Obtiene precio total del carrito
         $total =0;
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                array_push($productos,$pro);
-                $total += $pro['precio'] * $pro['unidades'];
-            }
+        foreach ($carrito as $producto_carrito) {
+            $total += $producto_carrito['precio'] * $producto_carrito['unidades'];
+            
         }
 
         return $this->render('carrito/index.html.twig', [
-            'productos' => $productos,
+            'productos' => $carrito,
             'total' => $total
         ]);
     }
 
-    public function deleteAll(Producto $producto){
+    public function deleteAll(){
         //Obtiene session
         $requestStack = $this->requestStack->getSession();
-
-        //Recorre objetos del carrito
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                $cont=1;
-                $requestStack->remove($cont); 
-                $cont++;
-            }
-        }
-        
+        //Elimina carrito
+        $requestStack->remove('Carrito');
 
         return $this->render('carrito/index.html.twig', [
             

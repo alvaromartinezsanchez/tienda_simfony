@@ -6,14 +6,17 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityManagerInterface;
 
 use App\Entity\Pedido;
 use App\Entity\Usuario;
 use App\Entity\LineasPedido;
 use App\Entity\Producto;
 use App\Entity\Categoria;
+use App\Form\PedidoRegisterType;
 
 class PedidoController extends AbstractController
 {
@@ -24,118 +27,75 @@ class PedidoController extends AbstractController
         $this->requestStack = $requestStack;
     }
 
-    public function realizarPedido()
+    public function realizarPedido(Request $request)
     {
 
         $requestStack = $this->requestStack->getSession();
 
         //-- Pedido --
         $pedido = new Pedido();
-        $pedido->setUsuario($this->getUser());
-        $pedido->setProvincia("Murcia");
-        $pedido->setLocalidad("Alhama de murcia");
-        $pedido->setDireccion("C/General Garcia Diaz");
-        $pedido->setEstado("Pagado");
-        $pedido->setFecha(new \DateTime('now'));
-        $pedido->setHora(new \DateTime('now'));
 
-        $productos = array();
-        $total =0;
-        foreach ($requestStack as $pro) {
-            if(is_array($pro)){
-                array_push($productos, $pro);
+        $form = $this->createForm(PedidoRegisterType::class, $pedido);
+
+        //Asigna valores recibidos del del formulario al objeto relacionado
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+
+
+            $pedido->setUsuario($this->getUser());
+            $pedido->setProvincia($form->get('provincia')->getData());
+            $pedido->setLocalidad($form->get('localidad')->getData());
+            $pedido->setDireccion($form->get('direccion')->getData());
+            $pedido->setEstado("Pagado");
+            $pedido->setFecha(new \DateTime('now'));
+            $pedido->setHora(new \DateTime('now'));
+
+            $productos = $requestStack->get('Carrito');
+            $total =0;
+
+            foreach ($productos as $pro) {
                 $total += $pro['precio'] * $pro['unidades'];
             }
-        }
 
-        $pedido->setCoste($total);
+            $pedido->setCoste($total);
 
-        //Guardar Pedido
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($pedido);
-        $em->flush();
-
-        //-- Lineas Pedido
-        foreach ($productos as $linea_producto) {
-            $linea_pedido = new LineasPedido();
-            $linea_pedido->setPedido($pedido);
-            $linea_pedido->setProducto($linea_producto['producto']);
-            $linea_pedido->setUnidades($linea_producto['unidades']);
-            $em->persist($linea_pedido);
+            //Guardar Pedido
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($pedido);
             $em->flush();
+
+            //-- Lineas Pedido
+            foreach ($productos as $linea_producto) {
+                $linea_pedido = new LineasPedido();
+                $linea_pedido->setPedido($pedido);
+
+                $categoria = $this->getDoctrine()->getRepository(Categoria::class)->findBy(['id' => $linea_producto['producto']->getCategoria()]);
+                $linea_producto['producto']->setCategoria($categoria[0]);
+
+                $linea_pedido->setProducto($linea_producto['producto']);
+                $linea_pedido->setUnidades($linea_producto['unidades']);
+                
+                $em->merge($linea_pedido);
+                $em->flush();
+
+                $pedido->addLineasPedido($linea_pedido);
+                $em->refresh($pedido);
+                
+            }
+
+            //Elimina productos del carrito
+            $requestStack->remove('Carrito');
+
+            return $this->render('pedido/index.html.twig', [
+                'pedido' => $pedido
+            ]);
         }
 
-
-
-        return $this->render('pedido/index.html.twig', [
-            'pedido' => $pedido
+        
+        return $this->render('pedido/direccion.html.twig', [
+            'form' => $form->createView()
         ]);
-
-        /*$em = $this->getDoctrine()->getManager();
-
-        echo "-----------PEDIDOS-------<br>";
-
-        $pedido_repo = $this->getDoctrine()->getRepository(Pedido::class);
-        $pedidos = $pedido_repo->findAll();
-
-        foreach ($pedidos as $pedido) {
-            echo $pedido->getProvincia() . " : " . $pedido->getUsuario()->getNombre() . "<br>";
-
-            foreach ($pedido->getLineasPedido() as $lineaPedido) {
-                echo " - " . $lineaPedido->getPedido()->getId() . $lineaPedido->getProducto()->getId() . $lineaPedido->getUnidades() . "<br>";
-            }
-        }
-
-        echo "---------USUARIOS------<br>";
-
-        $usuario_repo = $this->getDoctrine()->getRepository(Usuario::class);
-        $usuarios = $usuario_repo->findAll();
-
-        foreach ($usuarios as $usuario) {
-            echo $usuario->getNombre() ."<br>";
-            
-            foreach ($usuario->getPedidos() as $pedido) {
-                echo $pedido->getProvincia() . "<br>";
-            }
-        }
-
-        echo "---------Lineas Pedido------<br>";
-        $lineaPedido_repo = $this->getDoctrine()->getRepository(LineasPedido::class);
-        $lineasPedidos = $lineaPedido_repo->findAll();
-
-        foreach ($lineasPedidos as $lineaPedido) {
-            echo $lineaPedido->getPedido()->getId() . "<br>";
-            echo $lineaPedido->getProducto()->getNombre() . "<br>";
-        }
-
-        echo "---------PRODUCTO------<br>";
-        $producto_repo = $this->getDoctrine()->getRepository(Producto::class);
-        $productos = $producto_repo->findAll();
-
-        foreach ($productos as $producto) {
-            echo $producto->getNombre() . "<br>";
-            
-            foreach ($producto->getLineasPedido() as $productoEnLineaPedido) {
-                echo $productoEnLineaPedido->getId() . "<br>";
-            }
-        }
-
-        echo "---------Categoria------<br>";
-        $categoria_repo = $this->getDoctrine()->getRepository(Categoria::class);
-        $categorias = $categoria_repo->findAll();
-
-        foreach ($categorias as $categoria) {
-            echo $categoria->getNombre() . "<br>";
-            
-            foreach ($categoria->getProductos() as $producto) {
-                echo " - " . $producto->getNombre();
-            }
-        }
-
-
-        return $this->render('pedido/index.html.twig', [
-            'usuarios' => $usuarios
-        ]);
-        */
+        
     }
 }

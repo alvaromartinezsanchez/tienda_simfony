@@ -35,12 +35,11 @@ class Categoria
      /**
      * @ORM\OneToMany(targetEntity="App\Entity\Producto", mappedBy="categoria")
      */
-    private $producto;
+    private $productos;
 
     public function __construct()
     {
-        $this->$producto = new ArrayCollection();
-        $this->producto = new ArrayCollection();
+        $this->productos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -65,21 +64,14 @@ class Categoria
      */
     public function getProductos(): Collection
     {
-        return $this->producto;
+        return $this->productos;
     }
 
-    /**
-     * @return Collection|Producto[]
-     */
-    public function getProducto(): Collection
-    {
-        return $this->producto;
-    }
 
     public function addProducto(Producto $producto): self
     {
-        if (!$this->producto->contains($producto)) {
-            $this->producto[] = $producto;
+        if (!$this->productos->contains($producto)) {
+            $this->productos[] = $producto;
             $producto->setCategoria($this);
         }
 
@@ -98,4 +90,7 @@ class Categoria
         return $this;
     }
 
+    public function __toString() {
+        return $this->name;
+    }
 }

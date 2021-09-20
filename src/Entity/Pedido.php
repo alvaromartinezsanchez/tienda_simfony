@@ -84,7 +84,7 @@ class Pedido
     private $usuario;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\LineasPedido", mappedBy="pedido")
+     * @ORM\OneToMany(targetEntity="App\Entity\LineasPedido", mappedBy="pedido", cascade={"persist"})
      */
     private $lineasPedido;
 
@@ -206,7 +206,7 @@ class Pedido
     {
         if (!$this->lineasPedido->contains($lineasPedido)) {
             $this->lineasPedido[] = $lineasPedido;
-            $lineasPedido->setPedido($this);
+            //$lineasPedido->setPedido($this);
         }
 
         return $this;

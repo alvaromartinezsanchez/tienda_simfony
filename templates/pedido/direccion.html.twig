@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Direccion de envio
+{% endblock %}
+
+{% block body %}
+
+<div class="container register_form">
+    <div class="row justify-content-center">
+        <h1 class="col-8">Direccion de envio</h1>
+    </div>
+    
+
+    {{ form_start(form) }}
+    <div class="row">
+        <div class="col-5">
+            {{ form_row(form.provincia) }}
+        </div>
+        <div class="col-6">
+            {{ form_row(form.localidad) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-11">
+            {{ form_row(form.direccion) }}
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-11">
+            {{ form_row(form.submit) }}
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>
+
+{% endblock %}
